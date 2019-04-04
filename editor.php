@@ -200,6 +200,7 @@ class Brizy_Editor {
 			new Brizy_Editor_API( $post );
 			new Brizy_Editor_BlockScreenshotApi( $post );
 			new Brizy_Editor_Forms_Api( $post );
+			new Brizy_Editor_MediaProviders_Unsplash( $post );
 
 			// for other apis
 			do_action( 'brizy_register_api_methods', $user, $post );

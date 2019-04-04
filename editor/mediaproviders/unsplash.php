@@ -8,11 +8,6 @@ class Brizy_Editor_MediaProviders_Unsplash {
 	const API_URL         = 'https://brizy.io/';
 
 	/**
-	 * @var Brizy_Editor_Project
-	 */
-	private $project;
-
-	/**
 	 * @var Brizy_Editor_Post
 	 */
 	private $post;
@@ -20,12 +15,10 @@ class Brizy_Editor_MediaProviders_Unsplash {
 	/**
 	 * Brizy_Editor_API constructor.
 	 *
-	 * @param Brizy_Editor_Project $project
 	 * @param Brizy_Editor_Post $post
 	 */
-	public function __construct( $project, $post ) {
+	public function __construct( $post ) {
 
-		$this->project = $project;
 		$this->post    = $post;
 
 		$this->initialize();
