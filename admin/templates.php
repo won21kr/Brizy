@@ -513,6 +513,8 @@ class Brizy_Admin_Templates {
 				}
 
 				remove_filter( 'the_content', 'wpautop' );
+				remove_filter( 'the_content', 'shortcode_unautop' );
+				remove_filter( 'the_content', 'wptexturize' );
 
 				// insert the compiled head and content
 				add_filter( 'body_class', array( $this, 'bodyClassFrontend' ) );
@@ -527,7 +529,6 @@ class Brizy_Admin_Templates {
             Brizy_Logger::instance()->error($e->getMessage(),[$e]);
 		}
 	}
-
 
 	/**
 	 * @internal

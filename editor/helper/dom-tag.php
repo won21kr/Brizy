@@ -13,8 +13,7 @@ class Brizy_Editor_Helper_DomTag {
 	 * @param string $tag
 	 */
 	public function __construct( $tag ) {
-		$this->html_tag = trim( $tag ); ;
-		$this->fix_shortcode_attributes();
+		$this->html_tag = trim( $tag );
 	}
 
 	/**
@@ -79,18 +78,6 @@ class Brizy_Editor_Helper_DomTag {
 
 		return null;
 	}
-
-	/**
-	 * @return $this
-	 */
-	public function fix_shortcode_attributes() {
-		if ( $string = preg_replace( "/\&quot;/", '"', $this->html_tag ) ) {
-			$this->html_tag = $string;
-		}
-
-		return $this;
-	}
-
 
 	/**
 	 * @param $pattern
