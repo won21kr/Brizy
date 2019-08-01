@@ -181,9 +181,20 @@ class Brizy_Admin_Settings {
 	private function get_roles_tab() {
 		return Brizy_Admin_View::render(
 			'settings/roles',
-			array( 'roles' => array_map( array( $this, 'is_role_selected' ), $this->list_wp_roles() ), )
+			array( 'roles' => $this->list_wp_roles(), )
 		);
 	}
+
+	/**
+	 * @return array
+	 */
+	private function get_stored_caps() {
+		try {
+			return Brizy_Editor_Storage_Common::instance()->get( 'roles' );
+		} catch ( Exception $e ) {
+			return array();
+		}
+    }
 
 	/**
 	 * @return bool
@@ -231,24 +242,9 @@ class Brizy_Admin_Settings {
 	}
 
 	/**
-	 * Return the list of allowed capabilities Ids
-	 * @return array
-	 */
-	public function get_capabilities() {
-		$capabilities = $this->get_capability_options();
-		$caps         = array();
-
-		foreach ( $capabilities as $capability ) {
-			$caps[] = $capability['capability'];
-		}
-
-		return $caps;
-	}
-
-	/**
 	 * Return the list of capabilities including the label
 	 *
-	 * @return mixed|void
+	 * @return array
 	 */
 	public function get_capability_options() {
 		return apply_filters( 'brizy_settings_capability_options', array(
@@ -259,31 +255,32 @@ class Brizy_Admin_Settings {
 
 	public function roles_settings_submit() {
 		$allowed_roles        = array_map( array( $this, 'role_to_id' ), $this->list_wp_roles() );
-		$allowed_capabilities = $this->get_capabilities();
+		$allowed_capabilities = array_filter( wp_list_pluck( $this->get_capability_options(), 'capability' ) );
 		$roles                = isset( $_POST['role-capability'] ) ? (array) $_POST['role-capability'] : array();
+		$store                = array();
 
-		if ( count( $roles ) != 0 ) {
-			foreach ( $roles as $role_id => $capability ) {
+		foreach ( $roles as $role_id => $capability ) {
 
-				if ( ! in_array( $role_id, $allowed_roles ) ) {
-					continue;
-				}
+			if ( ! in_array( $role_id, $allowed_roles ) ) {
+				continue;
+			}
 
-				// validate capability
-				if ( $capability != "" && ! in_array( $capability, $allowed_capabilities ) ) {
-					continue;
-				}
+			// validate capability
+			if ( $capability != "" && ! in_array( $capability, $allowed_capabilities ) ) {
+				continue;
+			}
 
-				// remove all brizy capabilities from this role
-				foreach ( $allowed_capabilities as $cap ) {
-					wp_roles()->remove_cap( $role_id, $cap );
-				}
+			// remove all brizy capabilities from this role
+			foreach ( $allowed_capabilities as $cap ) {
+				wp_roles()->remove_cap( $role_id, $cap );
+			}
 
-				if ( $capability != "" ) {
-					wp_roles()->add_cap( $role_id, $capability );
-				}
+			if ( $capability != "" ) {
+				$store[ $role_id ] = $capability;
 			}
 		}
+
+		Brizy_Editor_Storage_Common::instance()->set( 'roles', $store );
 	}
 
 	/**
@@ -396,7 +393,6 @@ class Brizy_Admin_Settings {
 		return $types;
 	}
 
-
 	private function post_type_to_choice( WP_Post_Type $type ) {
 		return array(
 			'type' => $type->name,
@@ -412,7 +408,6 @@ class Brizy_Admin_Settings {
 		return $value['id'];
 	}
 
-
 	private function filter_types( WP_Post_Type $type ) {
 
 		return ! in_array( $type->name, array( 'attachment', 'elementor_library' ) );
@@ -424,27 +419,25 @@ class Brizy_Admin_Settings {
 		return $type;
 	}
 
-	private function is_role_selected( $role ) {
-		$role['selected'] = ! isset( $role['capabilities'][ Brizy_Admin_Capabilities::CAP_EDIT_WHOLE_PAGE ] );
-
-		return $role;
-	}
-
 	public function role_capability_select_row( $role ) {
+
+		$stored   = $this->get_stored_caps();
+		$selected = isset( $stored[ $role['id'] ] ) ? $stored[ $role['id'] ] : '';
 		?>
         <tr class="user-display-name-wrap">
             <th><label for="display_name"><?php echo $role['name'] ?></label></th>
             <td>
                 <select name="role-capability[<?php echo $role['id'] ?>]">
 					<?php
-					foreach ( $this->capability_options as $option ) {
-						?>
-                        <option value="<?php echo $option['capability'] ?>"
-							<?php echo isset( $role['capabilities'][ $option['capability'] ] ) ? 'selected' : '' ?>>
-							<?php echo $option['label'] ?>
-                        </option>
-						<?php
-					}
+                        foreach ( $this->capability_options as $option ) {
+
+                            $selected = $selected ? $selected : ( isset( $role['capabilities'][ $option['capability'] ] ) ? $option['capability'] : '' );
+                            ?>
+                            <option value="<?php echo $option['capability'] ?>"<?php selected( $selected, $option['capability'] ); ?>>
+                                <?php echo $option['label'] ?>
+                            </option>
+                            <?php
+                        }
 					?>
                 </select>
             </td>
