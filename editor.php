@@ -40,7 +40,7 @@ class Brizy_Editor {
 		add_action( 'wp_loaded', array( $this, 'wordpressLoaded' ) );
 		add_action( 'wp', array( $this, 'wordpressObjectCreated' ) );
 
-		if ( current_user_can( Brizy_Admin_Capabilities::CAP_EDIT_WHOLE_PAGE ) || Brizy_Editor::is_administrator() ) {
+		if ( Brizy_Admin_Capabilities::current_user_can( Brizy_Admin_Capabilities::CAP_EDIT_WHOLE_PAGE ) || Brizy_Editor::is_administrator() ) {
 			Brizy_Admin_Rules_Api::_init();
 		}
 
@@ -254,8 +254,6 @@ class Brizy_Editor {
 
 	private function loadEditorAdminSettings() {
 		try {
-			new Brizy_Admin_Capabilities( Brizy_Editor_Storage_Common::instance() );
-
 			if ( is_admin() ) {
 				Brizy_Admin_Main::instance();
 				Brizy_Admin_Settings::_init();
@@ -378,8 +376,8 @@ class Brizy_Editor {
 		if ( is_null( self::$is_allowed_for_current_user ) ) {
 			self::$is_allowed_for_current_user =
 				(
-					current_user_can( Brizy_Admin_Capabilities::CAP_EDIT_WHOLE_PAGE ) ||
-					current_user_can( Brizy_Admin_Capabilities::CAP_EDIT_CONTENT_ONLY )
+					Brizy_Admin_Capabilities::current_user_can( Brizy_Admin_Capabilities::CAP_EDIT_WHOLE_PAGE ) ||
+					Brizy_Admin_Capabilities::current_user_can( Brizy_Admin_Capabilities::CAP_EDIT_CONTENT_ONLY )
 				);
 		}
 

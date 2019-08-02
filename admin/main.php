@@ -33,7 +33,7 @@ class Brizy_Admin_Main {
 		// enqueue admin scripts
 		add_action( 'admin_enqueue_scripts', array( $this, 'action_register_static' ) );
 
-		if ( current_user_can( Brizy_Admin_Capabilities::CAP_EDIT_WHOLE_PAGE ) || Brizy_Editor::is_administrator() ) {
+		if ( Brizy_Admin_Capabilities::current_user_can( Brizy_Admin_Capabilities::CAP_EDIT_WHOLE_PAGE ) || Brizy_Editor::is_administrator() ) {
 			add_action( 'admin_post__brizy_admin_editor_enable', array(
 				$this,
 				'action_request_enable'
