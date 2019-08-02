@@ -186,17 +186,6 @@ class Brizy_Admin_Settings {
 	}
 
 	/**
-	 * @return array
-	 */
-	private function get_stored_caps() {
-		try {
-			return Brizy_Editor_Storage_Common::instance()->get( 'roles' );
-		} catch ( Exception $e ) {
-			return array();
-		}
-    }
-
-	/**
 	 * @return bool
 	 */
 	public function is_settings_page() {
@@ -421,7 +410,7 @@ class Brizy_Admin_Settings {
 
 	public function role_capability_select_row( $role ) {
 
-		$stored   = $this->get_stored_caps();
+		$stored   = Brizy_Admin_Capabilities::get_stored_caps();
 		$selected = isset( $stored[ $role['id'] ] ) ? $stored[ $role['id'] ] : '';
 		?>
         <tr class="user-display-name-wrap">

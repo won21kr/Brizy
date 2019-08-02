@@ -11,7 +11,7 @@ class Brizy_Admin_Capabilities {
 			return true;
 		}
 
-		$stored_roles = Brizy_Editor_Storage_Common::instance()->get( 'roles', false );
+		$stored_roles = self::get_stored_caps();
 		$roles        = self::get_current_user_roles();
 		$has_access   = false;
 
@@ -34,5 +34,16 @@ class Brizy_Admin_Capabilities {
 		$user = wp_get_current_user();
 
 		return (array) $user->roles;
+	}
+
+	/**
+	 * @return array
+	 */
+	public static function get_stored_caps() {
+		try {
+			return Brizy_Editor_Storage_Common::instance()->get( 'roles' );
+		} catch ( Exception $e ) {
+			return array();
+		}
 	}
 }
