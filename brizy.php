@@ -17,6 +17,17 @@ if ( isset( $_SERVER['HTTP_X_FORWARDED_PROTO'] ) && stripos( $_SERVER['HTTP_X_FO
 	$_SERVER['HTTPS'] = 'on';
 }
 
+if ( isset( $_REQUEST['brz-fast'] ) ) {
+
+    $input = json_decode( file_get_contents( "php://input" ), true );
+
+    if ( ! $input ) {
+        return wp_send_json_error(  );
+    }
+
+    die();
+}
+
 define( 'BRIZY_DEVELOPMENT', true );
 define( 'BRIZY_LOG', false );
 define( 'BRIZY_VERSION', '1.0.114' );

@@ -17,7 +17,8 @@ class Brizy_Editor_Asset_Crop_Cropper {
 
 		$this->services = array(
 			//'Brizy_Editor_Asset_Crop_ExternalService',
-			'Brizy_Editor_Asset_Crop_WordpressService'
+			'Brizy_Editor_Asset_Crop_FastService',
+			//'Brizy_Editor_Asset_Crop_WordpressService'
 		);
 	}
 
