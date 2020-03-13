@@ -57,8 +57,8 @@ class Brizy_Editor_Asset_Crop_FastService implements Brizy_Editor_Asset_Crop_Ser
 	 */
 	public function saveTargetImage() {
 		$args = [
-			'imgSource' => $this->sourcePath,
-			'actions'   => $this->actions
+			'source'  => $this->get_attachment_url( $this->sourcePath ), // str_replace( [ 'assets/'], ['assets.jpg/' ], $this->get_attachment_url( $this->sourcePath ) )
+			'actions' => $this->actions
 		];
 
 		$call = wp_remote_post( 'http://brizy.local/?brz-fast', [
@@ -85,6 +85,33 @@ class Brizy_Editor_Asset_Crop_FastService implements Brizy_Editor_Asset_Crop_Ser
 		$saveImg = file_put_contents( $this->targetPath, $body['img'] );
 
 		return (bool) $saveImg;
+	}
+
+	private function get_attachment_url( $path ) {
+
+		global $wpdb;
+
+		// detect if is a media resize, and strip resize portion of file name
+		if ( preg_match( '/(-\d{1,4}x\d{1,4})\.(jpg|jpeg|png|gif)$/i', $path, $matches ) ) {
+			$path = str_ireplace( $matches[1], '', $path );
+		}
+
+		// process and include the year / month folders so WP function below finds properly
+		if ( preg_match( '/uploads\/(\d{1,4}\/)?(\d{1,2}\/)?(.+)$/i', $path, $matches ) ) {
+			unset( $matches[0] );
+			$path = implode( '', $matches );
+		}
+
+		$post_id = $wpdb->get_var( $wpdb->prepare(
+			"SELECT post_id FROM $wpdb->postmeta WHERE meta_key = '_wp_attached_file' AND meta_value = %s",
+			$path
+		) );
+
+		if ( ! $post_id ) {
+			throw new Exception( 'Unable to find post id by path.' );
+		}
+
+		return wp_get_attachment_url( $post_id );
 	}
 
 }

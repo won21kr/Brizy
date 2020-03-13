@@ -21,14 +21,22 @@ if ( isset( $_REQUEST['brz-fast'] ) ) {
 
     $input = json_decode( file_get_contents( "php://input" ), true );
 
-    if ( ! $input ) {
-        wp_send_json_error( [ 'error' => 'Json null' ] );
+    if ( ! $input || empty( $input['source'] ) || empty( $input['actions'] ) ) {
+        wp_send_json_error( [ 'error' => 'Json wrong.' ] );
     }
 
-    echo '<pre style="background:#23282d;z-index:99999999;color:#78FF5B;font-size:14px;position:relative;">';
-    echo htmlspecialchars( print_r( $input, true ) );
-    echo '</pre>';
+	$source = $input['source'];
 
+	if ( ! filter_var( $source, FILTER_VALIDATE_URL ) || ! preg_match( "/^[^\?]+\.(jpg|jpeg|gif|png)(?:\?|$)/", $source ) ) {
+		wp_send_json_error( [ 'error' => 'Wrong url.' ] );
+	}
+
+	$parse_url = parse_url( $source );
+	$user      = preg_replace( '/[\\\/\?%\*:\'\$|\",<>\s]/', '', $parse_url['host'] );
+
+    echo '<pre style="background:#23282d;z-index:99999999;color:#78FF5B;font-size:14px;position:relative;">';
+    echo htmlspecialchars( print_r( $parse_url, true ) );
+    echo '</pre>';
     die();
 }
 
