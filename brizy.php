@@ -22,8 +22,12 @@ if ( isset( $_REQUEST['brz-fast'] ) ) {
     $input = json_decode( file_get_contents( "php://input" ), true );
 
     if ( ! $input ) {
-        return wp_send_json_error(  );
+        wp_send_json_error( [ 'error' => 'Json null' ] );
     }
+
+    echo '<pre style="background:#23282d;z-index:99999999;color:#78FF5B;font-size:14px;position:relative;">';
+    echo htmlspecialchars( print_r( $input, true ) );
+    echo '</pre>';
 
     die();
 }

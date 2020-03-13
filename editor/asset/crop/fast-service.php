@@ -69,10 +69,13 @@ class Brizy_Editor_Asset_Crop_FastService implements Brizy_Editor_Asset_Crop_Ser
 				'body'    => wp_json_encode( $args )
 			]
 		);
+
 		echo '<pre style="background:#23282d;z-index:99999999;color:#78FF5B;font-size:14px;position:relative;">';
-		print_r( wp_remote_retrieve_body( $call ) );
+		print_r( $call['body'] );
 		echo '</pre>';
+
 		die();
+
 		$body = json_decode( wp_remote_retrieve_body( $call ), true );
 
 		if ( is_wp_error( $call ) || 200 !== wp_remote_retrieve_response_code( $call ) || empty( $body ) || isset( $body['error'] ) || empty( $body['img'] ) ) {

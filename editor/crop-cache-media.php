@@ -119,15 +119,22 @@ class Brizy_Editor_CropCacheMedia extends Brizy_Editor_Asset_StaticFile {
 			throw new InvalidArgumentException( "Invalid crop filter" );
 		}
 
-		$resized_page_asset_path = $this->url_builder->page_upload_path( "/assets/images/" . $media_filter );
-		$resized_image_path      = $this->getResizedMediaPath( $original_asset_path, $media_filter );
+		// $original_asset_path = /var/www/html/wp/wp-content/uploads/brizy/2/assets/images/d09-fitness-bg.jpg
 
+		// /var/www/html/wp/wp-content/uploads/brizy/197/assets/images/iW=673&iH=421&oX=0&oY=0&cW=673&cH=396
+		$resized_page_asset_path = $this->url_builder->page_upload_path( "/assets/images/" . $media_filter );
+
+		// /var/www/html/wp/wp-content/uploads/brizy/197/assets/images/iW=673&iH=421&oX=0&oY=0&cW=673&cH=396/d09-fitness-bg.jpg
+		$resized_image_path      = $this->getResizedMediaPath( $original_asset_path, $media_filter );
+		// /var/www/html/wp/wp-content/uploads/brizy/197/assets/images/iW=673&iH=421&oX=0&oY=0&cW=673&cH=396/optimized
 		$optimized_image_path_dir  = dirname( $resized_image_path ) . DIRECTORY_SEPARATOR . 'optimized';
+		// /var/www/html/wp/wp-content/uploads/brizy/197/assets/images/iW=673&iH=421&oX=0&oY=0&cW=673&cH=396/optimized/d09-fitness-bg.jpg
 		$optimized_image_full_path = $optimized_image_path_dir . DIRECTORY_SEPARATOR . basename( $resized_image_path );
 
+		// /var/www/html/wp/wp-content/uploads/brizy/197/assets/images/iW=673&iH=421&oX=0&oY=0&cW=673&cH=396/hq
 		$hq_image_path_dir  = dirname( $resized_image_path ) . DIRECTORY_SEPARATOR . 'hq';
+		// /var/www/html/wp/wp-content/uploads/brizy/197/assets/images/iW=673&iH=421&oX=0&oY=0&cW=673&cH=396/hq/d09-fitness-bg.jpg
 		$hq_image_full_path = $hq_image_path_dir . DIRECTORY_SEPARATOR . basename( $resized_image_path );
-
 
 		if ( file_exists( $optimized_image_full_path ) ) {
 			return $optimized_image_full_path;
