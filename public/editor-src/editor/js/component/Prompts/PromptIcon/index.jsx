@@ -1,5 +1,5 @@
 import React, { Component, useEffect, useRef, useState } from "react";
-import classnames from "classnames";
+import classNames from "classnames";
 import Config from "visual/global/Config";
 import Fixed from "visual/component/Prompts/Fixed";
 import Select from "visual/component/Controls/Select";
@@ -7,9 +7,12 @@ import SelectItem from "visual/component/Controls/Select/SelectItem";
 import SmartGrid from "visual/component/Prompts/common/SmartGrid";
 import EditorIcon from "visual/component/EditorIcon";
 import { PromiseComponent } from "visual/component/PromiseComponent";
-import iconsMeta from "visual/config/icons.meta";
+import { getTypes, getCategories, getIconClassName } from "visual/config/icons";
+import { IS_WP, IS_PRO } from "visual/utils/models/modes";
+import { loadNucleo } from "visual/component/Prompts/PromptIcon/utils";
 
-const { types: TYPES, categories: CATEGORIES } = iconsMeta;
+const TYPES = getTypes();
+
 const typeIdsToNames = TYPES.reduce((acc, { id, name }) => {
   acc[id] = name;
 
@@ -28,6 +31,10 @@ export default class PromptIcon extends Component {
   containerRef = React.createRef();
 
   componentDidMount() {
+    if (!loadNucleo(IS_PRO, IS_WP)) {
+      return;
+    }
+
     const node = this.containerRef.current;
     const document = node.ownerDocument;
 
@@ -55,7 +62,7 @@ export default class PromptIcon extends Component {
     const tabs = TYPES.map(item => (
       <div
         key={item.id}
-        className={classnames("brz-ed-popup-tab-item", {
+        className={classNames("brz-ed-popup-tab-item", {
           active: item.id === this.state.typeId
         })}
         onClick={() => this.setState({ typeId: item.id })}
@@ -76,14 +83,14 @@ export default class PromptIcon extends Component {
   }
 
   renderFilters() {
-    const { categoryId, search } = this.state;
+    const { categoryId, search, typeId } = this.state;
     const categories = [
       {
         id: "*",
         name: "all",
         title: "All Categories"
       },
-      ...CATEGORIES
+      ...getCategories(typeId)
     ];
 
     return (
@@ -116,7 +123,7 @@ export default class PromptIcon extends Component {
             value={search}
           />
           <div
-            className={classnames("brz-ed-popup__search--icon", {
+            className={classNames("brz-ed-popup__search--icon", {
               active: search.length > 0
             })}
           >
@@ -153,12 +160,11 @@ export default class PromptIcon extends Component {
                 <PromiseComponent
                   getPromise={() =>
                     import(
-                      /* webpackChunkName: "config.icons" */ "visual/config/icons"
-                    )
+                      /* webpackChunkName: "config.icons" */ "visual/config/icons/icons"
+                    ).then(({ icons }) => ({ default: icons }))
                   }
-                  renderResolved={iconConfigModule => {
-                    const { icons } = iconConfigModule.default;
-                    const filteredIcons = this.filterIcons(icons);
+                  renderResolved={iconsModule => {
+                    const filteredIcons = this.filterIcons(iconsModule.default);
 
                     return (
                       <IconGrid
@@ -232,7 +238,7 @@ function IconGrid({ icons, value, onChange }) {
           type: typeIdsToNames[icon.type],
           name: icon.name
         };
-        const className = classnames("brz-ed-popup-icons__grid__item", {
+        const className = classNames("brz-ed-popup-icons__grid__item", {
           active: type === value.type && name === value.name
         });
 
@@ -250,7 +256,7 @@ function IconGrid({ icons, value, onChange }) {
               onChange({ type, name });
             }}
           >
-            <i className={`nc-icon nc-${type} nc-${type}-${name}`} />
+            <i className={classNames(["brz-font-icon", getIconClassName(icon)])} />
           </div>
         );
       }}
